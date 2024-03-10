@@ -3,12 +3,8 @@ import json
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-#player_id = 13852993 #jochen
+player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
-
-player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
-st.write("The data is displayed for the player:", player_id)
-
 
 def get_aoe4_data(player_id):
     try:
@@ -77,26 +73,25 @@ def full_game_info_extractor(sublist):
 
 
 
-def main():
 
-    result = get_aoe4_data(player_id)
+
+result = get_aoe4_data(player_id)
     #print(result_main)
     #game_results_main = extract_game_date(result_main)
     #df = define_dataframe(game_results_main)
     #fig = px.scatter(df, x="server", y="game_duration", color = "map")
     #st.plotly_chart(fig)
-    
-    sublist = create_sublist(result)
-    df = full_game_info_extractor(sublist)
-    print(df)
-    fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
-    #fig.show()
 
-    st.plotly_chart(fig)
-    return df
+sublist = create_sublist(result)
+df = full_game_info_extractor(sublist)
 
+#print(df)
+fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
+#fig.show()
 
+player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
+st.write("The data is displayed for the player:", player_id)
 
-if __name__ == "__main__":
-   df = main()
+st.dataframe(df.style.highlight_max(axis=0))
+st.plotly_chart(fig)
 
