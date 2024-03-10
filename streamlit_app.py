@@ -6,12 +6,8 @@ import plotly.express as px
 #player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
 
-
-# Get user input
 player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
 st.write("The data is displayed for the player:", player_id)
-
-
 
 
 def get_aoe4_data(player_id):
@@ -92,6 +88,7 @@ def main():
     
     sublist = create_sublist(result)
     df = full_game_info_extractor(sublist)
+    print(df)
     #fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
     #fig.show()
 
@@ -101,5 +98,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+   df = main()
 
