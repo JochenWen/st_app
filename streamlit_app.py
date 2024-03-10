@@ -81,7 +81,7 @@ df = full_game_info_extractor(sublist)
 
 
 #print(df)
-fig = px.scatter(df, x="opponent_civ", y="duration", color = "result", facet_col="map")
+fig = px.scatter(df, x="opponent_civ", y="duration", color = "result", facet_row="map")
 #fig.show()
 
 
