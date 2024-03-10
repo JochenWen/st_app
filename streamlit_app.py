@@ -89,10 +89,10 @@ def main():
     sublist = create_sublist(result)
     df = full_game_info_extractor(sublist)
     print(df)
-    #fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
+    fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
     #fig.show()
 
-    #st.plotly_chart(fig)
+    st.plotly_chart(fig)
     return df
 
 
