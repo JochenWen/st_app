@@ -2,7 +2,8 @@ import streamlit as st
 import numpy as np
 import plotly.figure_factory as ff
 
-user_input = st.text_input("label goes here", default_value_goes_here)
+title = st.text_input('Movie title', 'Life of Brian')
+st.write('The current movie title is', title)
 
 
 # Add histogram data
