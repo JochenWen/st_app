@@ -1,24 +1,19 @@
 import requests
 import json
 import pandas as pd
-import streamlit as st
 import plotly.express as px
-#player_id = 13852993 #jochen
+player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
 
-
-# Get user input
-player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
-st.write("The data is displayed for the player:", player_id)
 
 
 
 def get_aoe4_data(player_id):
     try:
         result = requests.get(f'https://aoe4world.com/api/v0/players/{player_id}/games?leaderboard=rm_solo') 
-    except: 
-        st.write("please enter a valid player_id")
-    result = result.json()
+        result = result.json()
+    except:
+        result = "player_string doesn't exist"
     return result
 
 def extract_game_date(result):
@@ -38,16 +33,67 @@ def define_dataframe(main_tuple):
     df.columns = ['game_duration', 'server', 'map']
     return df
 
+def create_sublist(result):
+    sublist = []
+    for item in result["games"]:
+        sublist.append(item)
+    return sublist
+
+def full_game_info_extractor(sublist):
+    game_data = {}     
+    for item in sublist:
+        game_id = item["game_id"]
+        maps = item["map"]
+        server = item["server"]
+        duration = item["duration"]
+
+        if item["teams"][0][0]["player"]["profile_id"] == player_id:
+            hero = item["teams"][0][0]["player"]["profile_id"]
+            result_hero = item["teams"][0][0]["player"]["result"]
+            mmr_diff_hero = item["teams"][0][0]["player"]["mmr_diff"]
+            civ_hero = item["teams"][1][0]["player"]["civilization"]
+            civ_opponent = item["teams"][1][0]["player"]["civilization"]
+
+        if  item["teams"][1][0]["player"]["profile_id"] == player_id:
+            hero = item["teams"][0][0]["player"]["profile_id"]
+            result_hero = item["teams"][0][0]["player"]["result"]
+            mmr_diff_hero = item["teams"][0][0]["player"]["mmr_diff"]
+            civ_hero = item["teams"][1][0]["player"]["civilization"]
+
+        game_data[game_id] = {
+            "maps" : maps,
+            "server": server,
+            "duration": duration/60,
+            "hero": hero,
+            "result_hero": result_hero,
+            "mmr_diff_hero": mmr_diff_hero,
+            "civ_hero": civ_hero,
+            "civ_opponent": civ_opponent
+        }     
+        df = pd.DataFrame(game_data).T
+    return df
+
+
 
 def main():
 
-    result_main = get_aoe4_data(player_id)
-    game_results_main = extract_game_date(result_main)
-    df = define_dataframe(game_results_main)
-    fig = px.scatter(df, x="server", y="game_duration", color = "map")
+    result = get_aoe4_data(player_id)
+    #print(result_main)
+    #game_results_main = extract_game_date(result_main)
+    #df = define_dataframe(game_results_main)
+    #fig = px.scatter(df, x="server", y="game_duration", color = "map")
+    #st.plotly_chart(fig)
+    
+    sublist = create_sublist(result)
+    df = full_game_info_extractor(sublist)
+    fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
+    #fig.show()
+
     st.plotly_chart(fig)
+    return df
+
 
 
 if __name__ == "__main__":
-    df = main()
+   df = main()
 
