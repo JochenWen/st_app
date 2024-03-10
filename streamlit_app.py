@@ -5,9 +5,6 @@ import streamlit as st
 import plotly.express as px
 player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
-#player_id = 1270139 # beasty
-
-
 
 def get_aoe4_data(player_id):
     try:
@@ -40,42 +37,35 @@ def create_sublist(result):
         sublist.append(item)
     return sublist
 
-def full_game_info_extractor(sublist):
-    game_data = {}     
-    for item in sublist:
-        game_id = item["game_id"]
-        maps = item["map"]
-        server = item["server"]
-        duration = item["duration"]
+def full_game_info_extractor(data):
+    data_output = []
 
-        if item["teams"][0][0]["player"]["profile_id"] == player_id:
-            hero = item["teams"][0][0]["player"]["profile_id"]
-            result_hero = item["teams"][0][0]["player"]["result"]
-            mmr_diff_hero = item["teams"][0][0]["player"]["mmr_diff"]
-            civ_hero = item["teams"][1][0]["player"]["civilization"]
-            civ_opponent = item["teams"][1][0]["player"]["civilization"]
-
-        if  item["teams"][1][0]["player"]["profile_id"] == player_id:
-            hero = item["teams"][0][0]["player"]["profile_id"]
-            result_hero = item["teams"][0][0]["player"]["result"]
-            mmr_diff_hero = item["teams"][0][0]["player"]["mmr_diff"]
-            civ_hero = item["teams"][1][0]["player"]["civilization"]
-
-        game_data[game_id] = {
-            "maps" : maps,
-            "server": server,
-            "duration": duration/60,
-            "hero": hero,
-            "result_hero": result_hero,
-            "mmr_diff_hero": mmr_diff_hero,
-            "civ_hero": civ_hero,
-            "civ_opponent": civ_opponent
-        }     
-        df = pd.DataFrame(game_data).T
-    return df
+    for item in data:
+        data_output.append(item)
 
 
 
+    unnested_data = []
+    for game in data_output:
+        for team in game['teams']:
+            for player_info in team:
+                game_info = game.copy()
+                game_info.update(player_info['player'])
+                del game_info['teams']
+                unnested_data.append(game_info)
+
+    df = pd.DataFrame(unnested_data)
+    df_hero = df[df["profile_id"] == player_id]
+    df_villain = df[df["profile_id"] != player_id]
+    df_villain["opponent_civ"] = df["civilization"]
+    villain_columns = ["opponent_civ", "game_id"]
+    df_villain_info = df_villain[villain_columns]
+    df_hero = df_hero.merge(df_villain_info, on='game_id', how='left')
+    return df_hero
+
+
+
+#player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
 
 
 result = get_aoe4_data(player_id)
@@ -88,12 +78,11 @@ result = get_aoe4_data(player_id)
 sublist = create_sublist(result)
 df = full_game_info_extractor(sublist)
 
+
 #print(df)
-fig = px.scatter(df, x="civ_opponent", y="duration", color = "result_hero")
+fig = px.scatter(df, x="opponent_civ", y="duration", color = "result")
 #fig.show()
 
-player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
-st.write("The data is displayed for the player:", player_id)
 
 st.dataframe(df.style.highlight_max(axis=0))
 st.plotly_chart(fig)
