@@ -3,9 +3,9 @@ import json
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-#player_id = 13852993 #jochen
+player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
-player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
+#player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
 
 def get_aoe4_data(player_id):
     try:
