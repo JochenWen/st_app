@@ -3,8 +3,9 @@ import json
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-player_id = 13852993 #jochen
+#player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
+player_id = 1270139 # beasty
 
 def get_aoe4_data(player_id):
     try:
