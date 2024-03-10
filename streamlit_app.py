@@ -1,24 +1,50 @@
+import requests
+import json
+import pandas as pd
 import streamlit as st
-import numpy as np
-import plotly.figure_factory as ff
-
-title = st.text_input('Movie title', 'Life of Brian')
-st.write('The current movie title is', title)
+import plotly.express as px
+#player_id = 13852993 #jochen
+#player_id = 13766994 #adrian
 
 
-# Add histogram data
-x1 = np.random.randn(200) - 2
-x2 = np.random.randn(200)
-x3 = np.random.randn(200) + 2
+# Get user input
+player_id = st.text_input("Enter your name", "")
+st.write("The data is displayed for the player:", player_id)
 
-# Group data together
-hist_data = [x1, x2, x3]
 
-group_labels = ['Group 1', 'Group 2', 'Group 3']
 
-# Create distplot with custom bin_size
-fig = ff.create_distplot(
-        hist_data, group_labels, bin_size=[.1, .25, .5])
+def get_aoe4_data(player_id):
+    result = requests.get(f'https://aoe4world.com/api/v0/players/{player_id}/games?leaderboard=rm_solo') 
+    result = result.json()
+    return result
 
-# Plot!
-st.plotly_chart(fig, use_container_width=True)
+def extract_game_date(result):
+    games = result["games"]
+    duration, server, maps = [], [], []
+
+    for item in games:
+        maps.append(item["map"])
+        duration.append(item["duration"]/60)
+        server.append(item["server"])
+
+    return duration, server, maps
+
+def define_dataframe(main_tuple):
+    data_dict = {f'col{i}': lst for i, lst in enumerate(main_tuple)}
+    df = pd.DataFrame(data_dict)
+    df.columns = ['game_duration', 'server', 'map']
+    return df
+
+
+def main():
+
+    result_main = get_aoe4_data(player_id)
+    game_results_main = extract_game_date(result_main)
+    df = define_dataframe(game_results_main)
+    fig = px.scatter(df, x="server", y="game_duration", color = "map")
+    st.plotly_chart(fig)
+
+
+if __name__ == "__main__":
+    df = main()
+
