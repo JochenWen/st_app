@@ -1,2 +1,5 @@
 numpy
 plotly-express
+pandas 
+requests
+json
