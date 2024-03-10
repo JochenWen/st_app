@@ -8,7 +8,7 @@ import plotly.express as px
 
 
 # Get user input
-player_id = st.text_input("Enter your name", "")
+player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994", "1270139")
 st.write("The data is displayed for the player:", player_id)
 
 
