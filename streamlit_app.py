@@ -14,7 +14,10 @@ st.write("The data is displayed for the player:", player_id)
 
 
 def get_aoe4_data(player_id):
-    result = requests.get(f'https://aoe4world.com/api/v0/players/{player_id}/games?leaderboard=rm_solo') 
+    try:
+        result = requests.get(f'https://aoe4world.com/api/v0/players/{player_id}/games?leaderboard=rm_solo') 
+    except: 
+        st.write("please enter a valid player_id")
     result = result.json()
     return result
 
