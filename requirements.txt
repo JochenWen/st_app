@@ -1,2 +1,2 @@
-import numpy as np
-import plotly.figure_factory as ff
+numpy
+plotly-express
