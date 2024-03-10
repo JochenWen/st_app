@@ -55,6 +55,7 @@ def full_game_info_extractor(data):
                 unnested_data.append(game_info)
 
     df = pd.DataFrame(unnested_data)
+    df["duration"] = df["duration"]/60
     df_hero = df[df["profile_id"] == player_id]
     df_villain = df[df["profile_id"] != player_id]
     df_villain["opponent_civ"] = df["civilization"]
