@@ -84,7 +84,7 @@ df = full_game_info_extractor(sublist)
 #print(df)
 fig = px.scatter(df, x="opponent_civ", y="duration", color = "result")
 #fig.show()
-
+st.line_chart(df, x="started_date", y="rating")
 
 st.dataframe(df.style.highlight_max(axis=0))
 st.plotly_chart(fig)
