@@ -5,11 +5,17 @@ import streamlit as st
 import plotly.express as px
 #player_id = 13852993 #jochen
 #player_id = 13766994 #adrian
+
+
 player_id = int(st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139"))
+st.write("You entered:", player_id)
+
+
 
 def get_aoe4_data(player_id):
+    
     result = requests.get(f'https://aoe4world.com/api/v0/players/{player_id}/games?leaderboard=rm_solo') 
-    result = result.json()
+    result = result.json()    
     return result
 
 def extract_game_date(result):
@@ -53,7 +59,6 @@ def full_game_info_extractor(data):
                 unnested_data.append(game_info)
 
     df = pd.DataFrame(unnested_data)
-    df["duration"] = df["duration"]/60
     df_hero = df[df["profile_id"] == player_id]
     df_villain = df[df["profile_id"] != player_id]
     df_villain["opponent_civ"] = df["civilization"]
@@ -63,26 +68,14 @@ def full_game_info_extractor(data):
     return df_hero
 
 
+def main ():
+    
+    result = get_aoe4_data(player_id)
+    sublist = create_sublist(result)
+    df = full_game_info_extractor(sublist)
+    fig = px.scatter(df, x="opponent_civ", y="duration", color = "result")
+    st.dataframe(df.style.highlight_max(axis=0))
+    st.plotly_chart(fig)
 
-#player_id = st.text_input("Enter your AOE4 world string here, i.e. https://aoe4world.com/players/13766994 - the last string after players", "1270139")
-
-
-result = get_aoe4_data(player_id)
-    #print(result_main)
-    #game_results_main = extract_game_date(result_main)
-    #df = define_dataframe(game_results_main)
-    #fig = px.scatter(df, x="server", y="game_duration", color = "map")
-    #st.plotly_chart(fig)
-
-sublist = create_sublist(result)
-df = full_game_info_extractor(sublist)
-
-
-#print(df)
-fig = px.scatter(df, x="opponent_civ", y="duration", color = "result")
-#fig.show()
-
-st.dataframe(df.style.highlight_max(axis=0))
-st.plotly_chart(fig)
-#st.line_chart(df, x="started_at", y="rating")
-
+if __name__ == "__main__":
+    main()
