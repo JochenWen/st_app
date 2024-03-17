@@ -2,3 +2,4 @@ numpy
 plotly-express
 pandas 
 requests
+matplotlib
